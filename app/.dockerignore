@@ -6,4 +6,3 @@ migrations/alembic/versions/*
 *.sqlite
 *.env
 .env.local
-docker-compose.yml
