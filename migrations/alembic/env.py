@@ -42,16 +42,7 @@ def run_migrations_offline() -> None:
     script output.
 
     """
-    # url = config.get_main_option("sqlalchemy.url") 
-    # db_url = os.getenv("DB_URL")
-    # if not db_url:
-    #     raise ValueError("DB_URL environment variable must be set")
-
-    # # Properly set the SQLAlchemy URL
-
-    url = os.getenv("DB_URL")
-    url = config.set_main_option("sqlalchemy.url", url)
-
+    url = config.get_main_option("sqlalchemy.url") 
 
     context.configure(
         url=url,
