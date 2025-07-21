@@ -1,0 +1,66 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name:  app-fastapi
+  namespace: default
+  labels:
+    app: app-fastapi
+spec:
+  selector:
+    matchLabels:
+      app: app-fastapi
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app:  app-fastapi
+    spec:
+      initContainers:
+      - name: check-liveleness-of-the-db
+        image: busybox
+        ports:
+        - containerPort: 5432
+        command: ["sh", "-c", "until nc -z svc-db 5432; do sleep 2; done"]
+
+      - name: run-migrations
+        image: incept1on/migrations-test:migration
+        imagePullPolicy: Always
+        env:
+        - name: DB_URL
+          valueFrom:
+            secretKeyRef:
+              name: secrets
+              key: DB_URL
+        ports:
+        - containerPort: 5432
+
+      containers:
+      - name:  app-fastapi
+        image: incept1on/migrations-test:app
+        imagePullPolicy: Always
+        env:
+        - name: DB_URL
+          valueFrom:
+            secretKeyRef:
+              name: secrets
+              key: DB_URL
+        ports:
+        - containerPort:  8000
+          name:  app-fastapi
+      restartPolicy: Always
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: svc-fastapi-app
+  namespace: default
+spec:
+  selector:
+    app: app-fastapi 
+  type: NodePort
+  ports:
+  - name: svc-fastapi-app
+    protocol: TCP
+    port: 8000
+    targetPort: 8000 
+    nodePort: 30000

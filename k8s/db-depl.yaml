@@ -1,0 +1,51 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name:  db-depl
+  namespace: default
+  labels:
+    app:  db-depl
+spec:
+  selector:
+    matchLabels:
+      app: db-depl
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app:  db-depl
+    spec:
+      containers:
+      - name:  db-depl
+        image: postgres:alpine3.22
+        imagePullPolicy: Always
+        env:
+        - name: POSTGRES_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: secrets
+              key: POSTGRES_PASSWORD
+        - name: POSTGRES_DB
+          valueFrom:
+            secretKeyRef:
+              name: secrets
+              key: POSTGRES_DB
+        ports:
+        - containerPort: 5432 
+          name:  db-depl
+      restartPolicy: Always
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: svc-db
+  namespace: default
+spec:
+  selector:
+    app: db-depl
+  type: ClusterIP
+  ports:
+  - name: svc-db
+    protocol: TCP
+    port: 5432
+    targetPort: 5432 

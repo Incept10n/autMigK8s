@@ -1,5 +1,4 @@
 #!/bin/sh
-sleep 5
 
 echo "changing url to one which in the env var"
 DB_URL="$DB_URL"
