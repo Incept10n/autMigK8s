@@ -33,7 +33,7 @@ jobs:
           provenance: false
 
   buildAndPushAppImage:
-    name: Push Docker image to Docker Hub
+    name: Push App image to Docker Hub
     runs-on: ubuntu-latest
     permissions:
       packages: write
